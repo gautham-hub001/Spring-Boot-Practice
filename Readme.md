@@ -1,4 +1,16 @@
+mvn install is the option that is most often used. It will only create a jar file.
+mvn package is seldom used, only if you're debugging some issue with the maven build process. It will create a jar file and install the jar (and class etc.) files in the proper places if other code depends on those jars.
+mvn clean install: deletes the target directory and recreates all jars in that location.
+
+Dependencies will be stored at ~/.m2/repository. So, if you want to remove any unnecessary cache:
+rm -rf ~/.m2/repository
+
 You don't need external servers for Spring boot. You have embedded tomcat. You don't need to install tomcat seperately, you candirectly run the project.
+
+# Error points
+
+1. Was getting tomcat jasper errors if spring 3.x is used. So, use spring 2.x
+2. Getting error if commenting and uncommenting lines in application.properties. Had to remove everything and type word-by-word to get dropdowns and used them and hten it worked. So, be careful when commenting and uncommenting code.
 
 ## @Component
 
@@ -63,4 +75,32 @@ It will inform spring boot that you're not returning a String, you're returning 
 
 # @RestController ?
 
-For REST controller classes
+Used for REST controller classes
+
+For working with .jsp files, you need to add a dependency: tomcat jasper(JSP Parser). Goto mvnrepository.com and search for jasper and check the version of the embedded tomcat in your project by running **mvn dependency:tree** in terminal and click on the same versdion of jasper from here and copy the dependency code for maven and paste it in your pom.xml file.
+
+Now, spring boot can convert the jsp into servlet.
+
+The webapp folder we're using is public. To make it private:
+
+Create a sub folder inside webapp called as pages and move home.jsp to pages
+change return "home.jsp" to "home"
+Open applicaiton.properties file and here we'll mention prefix and suffix: spring.mvc.view.prefix=/pages/ spring.mvc.view.suffix=.jsp
+We can also use .yaml file instead of application.properties but only in application.preoperties we can mention all the properties
+
+Getting data from user (Dynamic page): You want to create a dynamic page which takes user name and displays it on the page. eg: localhst:8080/home?name=gautham
+
+In your HomeController: public String home(HttpServletRequest req){ String name = req.getParameter("name"); }
+
+To send this data to the web page, spring boot would use either RequestDispatcher or res.sendredirect
+Watch Servlet videos: requestDispatcher
+
+If you check the URL, it won't e changed even after the page gets reloaded. So, spring is using RequestDispatcher
+
+In RequestDispatcher, 2 servlets or 1 servlet and 1 RequestDispatcher share the same req object.
+
+1. First way:
+   To send the name parameter we will do: req.setAttribute("name") and we will use req.getAttribute("name") at home.jsp
+2. Second way: Using HttpSession
+   We can print the name parameter using JSTl(EL language - Expression language)
+   ${name}
